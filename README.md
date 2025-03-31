@@ -34,12 +34,13 @@ The snippet below demonstrates the use of this function to compute monthly mean 
 library(raster)
 library(sf)
 library(exactextractr)
+library(geodata)
 
 # Pull municipal boundaries for Brazil
-brazil <- st_as_sf(getData('GADM', country='BRA', level=2))
+brazil <- st_as_sf(gadm("Brazil", level = 2, path = "."))
 
 # Pull gridded precipitation data
-prec <- getData('worldclim', var='prec', res=10)
+prec <- worldclim_country(country = "Brazil", var = "prec", res = 10, path = ".")
 
 # Calculate vector of mean December precipitation amount for each municipality
 brazil$mean_dec_prec <- exact_extract(prec[[12]], brazil, 'mean')
@@ -220,8 +221,8 @@ of minimum and maximum temperatures, and a
 of cell areas.
 
 ```r
-tmin <- getData('worldclim', var = 'tmin', res = 10)
-tmax <- getData('worldclim', var = 'tmax', res = 10)
+tmin <- worldclim_global(var = "tmin", res = 10, path = ".")
+tmax <- worldclim_global(var = "tmax", res = 10, path = ".")
 
 temp <- stack(tmin[[12]], tmax[[12]])
 
@@ -258,7 +259,7 @@ In this example, the mean temperature for each municipality is returned for
 each altitude category.
 
 ```r
-altitude <- getData('alt', country = 'BRA')
+altitude <- elevation_30s(country = "Brazil", path = ".")
 
 prec_for_altitude <- exact_extract(prec[[12]], brazil, function(prec, frac, alt) {
   # ignore cells with unknown altitude
@@ -298,10 +299,10 @@ package and somewhat faster than the `terra` package. An example benchmark
 is below:
 
 ```r
-brazil <- st_as_sf(getData('GADM', country='BRA', level=1))
+brazil <- st_as_sf(gadm("Brazil", level = 1, path = "."))
 brazil_spat <- as(brazil, 'SpatVector')
 
-prec_rast <- getData('worldclim', var='prec', res=10)
+prec_rast <- worldclim_country(country = "Brazil", var = "prec", res = 10, path = ".")
 prec_terra <- rast(prec_rast) 
 prec12_rast <- prec_rast[[12]]
 prec12_terra <- rast(prec_rast[[12]])
